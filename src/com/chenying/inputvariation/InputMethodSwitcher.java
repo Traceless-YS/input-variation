@@ -1,5 +1,7 @@
 package com.chenying.inputvariation;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.CaretEvent;
@@ -48,27 +50,42 @@ public class InputMethodSwitcher implements StartupActivity {
     }
 
     private void checkCommentZone(Editor editor, int offset) {
+        if (editor == null || editor.getProject() == null) return;
+
         PsiFile psiFile = PsiUtilBase.getPsiFileInEditor(editor, editor.getProject());
         if (psiFile == null) return;
 
         // 延迟执行，避免频繁检查和切换
         executorService.schedule(() -> {
-            // 判断当前位置是否在注释中
-            boolean isInComment = CommentDetector.isInComment(psiFile, offset);
-            
-            if (isInComment != inCommentZone) {
-                inCommentZone = isInComment;
-                if (isInComment) {
-                    switchToChineseInputMethod();
-                    // 使用CustomCaret来设置红色光标
-                    CustomCaret.applyRedCaret(editor);
-                } else {
-                    switchToEnglishInputMethod();
-                    // 使用CustomCaret来恢复默认光标
-                    CustomCaret.restoreDefaultCaret(editor);
-                }
-            }
-        }, 50, TimeUnit.MILLISECONDS);
+
+            ApplicationManager.getApplication().invokeLater(() ->{
+                // 在ReadAction中执行PSI操作
+                ApplicationManager.getApplication().runReadAction(() -> {
+                    try {
+                        // 判断当前位置是否在注释中
+                        boolean isInComment = CommentDetector.isInComment(psiFile, offset);
+
+                        if (isInComment != inCommentZone) {
+                            inCommentZone = isInComment;
+                            if (isInComment) {
+                                switchToChineseInputMethod();
+                                // 使用CustomCaret来设置红色光标
+                                CustomCaret.applyRedCaret(editor);
+                            } else {
+                                switchToEnglishInputMethod();
+                                // 使用CustomCaret来恢复默认光标
+                                CustomCaret.restoreDefaultCaret(editor);
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        // 记录错误但不中断操作
+                        Logger.getInstance(InputMethodSwitcher.class).warn("Error checking comment zone", e);
+                    }
+                });
+            });
+        }, 40, TimeUnit.MILLISECONDS);
+
     }
 
     private void switchToChineseInputMethod() {
@@ -84,4 +101,4 @@ public class InputMethodSwitcher implements StartupActivity {
             inputMethodChanged = false;
         }
     }
-} 
+}
