@@ -2,10 +2,9 @@ package com.chenying.inputvariation;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
-import com.sun.jna.platform.win32.WinDef.WPARAM;
 import com.sun.jna.platform.win32.WinDef.LPARAM;
+import com.sun.jna.platform.win32.WinDef.WPARAM;
 import com.sun.jna.win32.StdCallLibrary;
 
 /**

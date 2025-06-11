@@ -1,21 +1,9 @@
 package com.chenying.inputvariation;
 
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.CaretModel;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.event.EditorFactoryListener;
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,8 +1,6 @@
 package com.chenying.inputvariation;
 
-import com.intellij.lang.Language;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -42,54 +40,8 @@ public class CommentDetector {
         if (element instanceof XmlComment || element.getParent() instanceof XmlComment) {
             return true;
         }
-        
-    //     // 检查注释的文本表示
-    //     String text = element.getText();
-    //     if (text != null) {
-    //         // Java风格注释: //, /*, */, /**
-    //         if (text.contains("//") || text.contains("/*") || text.contains("*/") || text.contains("/**")) {
-    //             return true;
-    //         }
-            
-    //         // XML风格注释: <!-- -->
-    //         if (text.contains("<!--") || text.contains("-->")) {
-    //             return true;
-    //         }
-            
-    //         // Shell, Python, YAML等使用#的注释
-    //         if (text.contains("#")) {
-    //             FileType fileType = psiFile.getFileType();
-    //             String extension = fileType.getDefaultExtension().toLowerCase();
-    //             return HASH_COMMENT_EXTENSIONS.contains(extension);
-    //         }
-    //     }
-        
-    //     // 判断文档中的行是否是注释
-    //     Document document = psiFile.getViewProvider().getDocument();
-    //     if (document != null) {
-    //         int lineStartOffset = document.getLineStartOffset(document.getLineNumber(offset));
-    //         String lineText = document.getText().substring(lineStartOffset, 
-    //             Math.min(lineStartOffset + 50, document.getTextLength())).trim();
-            
-    //         if (lineText.startsWith("//") || lineText.startsWith("/*") || lineText.startsWith("*") || 
-    //             lineText.startsWith("*/") || lineText.startsWith("/**")) {
-    //             return true;
-    //         }
-            
-    //         if (lineText.startsWith("<!--") || lineText.endsWith("-->")) {
-    //             return true;
-    //         }
-            
-    //         if (lineText.startsWith("#")) {
-    //             String extension = psiFile.getFileType().getDefaultExtension().toLowerCase();
-    //             return HASH_COMMENT_EXTENSIONS.contains(extension);
-    //         }
-    //     }
-        
-    //     return false; 
 
         // 判断文档中的行是否是注释，同时确保光标在注释符号之后
-
         Document document = psiFile.getViewProvider().getDocument();
         if (document != null) {
             int lineNumber = document.getLineNumber(offset);
