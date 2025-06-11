@@ -43,46 +43,82 @@ public class CommentDetector {
             return true;
         }
         
-        // 检查注释的文本表示
-        String text = element.getText();
-        if (text != null) {
-            // Java风格注释: //, /*, */, /**
-            if (text.contains("//") || text.contains("/*") || text.contains("*/") || text.contains("/**")) {
-                return true;
-            }
+    //     // 检查注释的文本表示
+    //     String text = element.getText();
+    //     if (text != null) {
+    //         // Java风格注释: //, /*, */, /**
+    //         if (text.contains("//") || text.contains("/*") || text.contains("*/") || text.contains("/**")) {
+    //             return true;
+    //         }
             
-            // XML风格注释: <!-- -->
-            if (text.contains("<!--") || text.contains("-->")) {
-                return true;
-            }
+    //         // XML风格注释: <!-- -->
+    //         if (text.contains("<!--") || text.contains("-->")) {
+    //             return true;
+    //         }
             
-            // Shell, Python, YAML等使用#的注释
-            if (text.contains("#")) {
-                FileType fileType = psiFile.getFileType();
-                String extension = fileType.getDefaultExtension().toLowerCase();
-                return HASH_COMMENT_EXTENSIONS.contains(extension);
-            }
-        }
+    //         // Shell, Python, YAML等使用#的注释
+    //         if (text.contains("#")) {
+    //             FileType fileType = psiFile.getFileType();
+    //             String extension = fileType.getDefaultExtension().toLowerCase();
+    //             return HASH_COMMENT_EXTENSIONS.contains(extension);
+    //         }
+    //     }
         
-        // 判断文档中的行是否是注释
+    //     // 判断文档中的行是否是注释
+    //     Document document = psiFile.getViewProvider().getDocument();
+    //     if (document != null) {
+    //         int lineStartOffset = document.getLineStartOffset(document.getLineNumber(offset));
+    //         String lineText = document.getText().substring(lineStartOffset, 
+    //             Math.min(lineStartOffset + 50, document.getTextLength())).trim();
+            
+    //         if (lineText.startsWith("//") || lineText.startsWith("/*") || lineText.startsWith("*") || 
+    //             lineText.startsWith("*/") || lineText.startsWith("/**")) {
+    //             return true;
+    //         }
+            
+    //         if (lineText.startsWith("<!--") || lineText.endsWith("-->")) {
+    //             return true;
+    //         }
+            
+    //         if (lineText.startsWith("#")) {
+    //             String extension = psiFile.getFileType().getDefaultExtension().toLowerCase();
+    //             return HASH_COMMENT_EXTENSIONS.contains(extension);
+    //         }
+    //     }
+        
+    //     return false; 
+
+
+        // 判断文档中的行是否是注释，同时确保光标在注释符号之后
+
         Document document = psiFile.getViewProvider().getDocument();
         if (document != null) {
-            int lineStartOffset = document.getLineStartOffset(document.getLineNumber(offset));
+            int lineNumber = document.getLineNumber(offset);
+            int lineStartOffset = document.getLineStartOffset(lineNumber);
             String lineText = document.getText().substring(lineStartOffset, 
-                Math.min(lineStartOffset + 50, document.getTextLength())).trim();
+                Math.min(lineStartOffset + 50, document.getTextLength()));
             
-            if (lineText.startsWith("//") || lineText.startsWith("/*") || lineText.startsWith("*") || 
-                lineText.startsWith("*/") || lineText.startsWith("/**")) {
+            // 获取光标在当前行的相对位置
+            int relativeOffset = offset - lineStartOffset;
+            
+            // 检查各种注释类型，确保光标在注释符号之后
+            if (lineText.trim().startsWith("//") && relativeOffset > lineText.indexOf("//")) {
+                return true;
+            }
+            if (lineText.trim().startsWith("/*") && relativeOffset > lineText.indexOf("/*")) {
+                return true;
+            }
+            if (lineText.trim().startsWith("*") && relativeOffset > lineText.indexOf("*")) {
+                return true;
+            }
+            if (lineText.trim().startsWith("<!--") && relativeOffset > lineText.indexOf("<!--")) {
                 return true;
             }
             
-            if (lineText.startsWith("<!--") || lineText.endsWith("-->")) {
-                return true;
-            }
-            
-            if (lineText.startsWith("#")) {
+            // 对于#注释，检查文件类型和光标位置
+            if (lineText.trim().startsWith("#")) {
                 String extension = psiFile.getFileType().getDefaultExtension().toLowerCase();
-                return HASH_COMMENT_EXTENSIONS.contains(extension);
+                return HASH_COMMENT_EXTENSIONS.contains(extension) && relativeOffset > lineText.indexOf("#");
             }
         }
         
